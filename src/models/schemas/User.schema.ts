@@ -1,10 +1,5 @@
 import { ObjectId } from 'mongodb'
-
-enum UserVerifyStatus {
-  Unverified, // chưa xác thực email, mặc định = 0
-  Verified, // đã xác thực email
-  Banned // bị khóa
-}
+import { UserVerifyStatus } from '~/constants/enum'
 
 type UserType = {
   _id?: ObjectId
@@ -25,6 +20,13 @@ type UserType = {
   avatar?: string
   cover_photo?: string
 }
+
+// nếu dùng interface sẽ bị báo lỗi typescript
+
+// dùng class sẽ giúp loại bỏ các field không cần thiết được insert vào db
+// ví dụ pass confirm_password vào class User,
+// mà bên trong class User không có thuộc tính confirm_password
+// thì insertOne sẽ không đưa thuộc tính confirm_password lên db
 
 export default class User {
   _id?: ObjectId
