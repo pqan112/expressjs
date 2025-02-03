@@ -3,8 +3,14 @@ import { checkSchema } from 'express-validator'
 import databaseService from '~/services/database.service'
 import usersService from '~/services/users.service'
 import { validate } from '~/utils/validation'
+import { ParamsDictionary } from 'express-serve-static-core'
+import { RegisterReqBody } from '~/models/requests/User.request'
 
-export const loginValidator = (req: Request, res: Response, next: NextFunction) => {
+export const loginValidator = (
+  req: Request<ParamsDictionary, any, RegisterReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
   const { email, password } = req.body
 
   if (!email || !password) {
@@ -60,14 +66,6 @@ export const registerValidator = validate(
           minNumbers: 1,
           minSymbols: 1
         }
-      },
-      custom: {
-        options: (value, { req }) => {
-          if (value !== req.body.password) {
-            throw new Error('Password confirmation does not match password')
-          }
-          return true
-        }
       }
     },
     confirm_password: {
@@ -88,6 +86,14 @@ export const registerValidator = validate(
           minUppercase: 1,
           minNumbers: 1,
           minSymbols: 1
+        }
+      },
+      custom: {
+        options: (value, { req }) => {
+          if (value !== req.body.password) {
+            throw new Error('Password confirmation does not match password')
+          }
+          return true
         }
       }
     },
