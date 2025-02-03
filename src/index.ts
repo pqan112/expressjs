@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import { env } from './configs/environment'
 import usersRouter from './routes/users.routes'
 import databaseService from './services/database.service'
@@ -11,6 +11,12 @@ const startApp = () => {
 
   // routers
   app.use('/users', usersRouter)
+
+  // global error handler
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.log('lỗi nè: ', err.message)
+    res.status(400).json({ message: err.message })
+  })
 
   app.listen(env.PORT, () => {
     console.log(`3. App is running on http://localhost:${env.PORT}`)
