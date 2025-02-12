@@ -1,6 +1,11 @@
 import { Router } from 'express'
-import { loginController, registerController } from '~/controllers/users.controller'
-import { loginValidator, registerValidator } from '~/middlewares/users.middlewares'
+import { loginController, logoutController, registerController } from '~/controllers/users.controller'
+import {
+  accessTokenValidator,
+  loginValidator,
+  refreshTokenValidator,
+  registerValidator
+} from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -26,5 +31,6 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
 // logout phải dùng method POST (để người dùng bấm nút logout)
 // vì nếu dùng method GET người dùng enter url trên browser
 // thì gọi đến API logout -> không hợp lý
+usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
 
 export default usersRouter

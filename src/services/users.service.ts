@@ -1,12 +1,12 @@
+import { ObjectId } from 'mongodb'
 import { env } from '~/configs/environment'
 import { TokenType } from '~/constants/enum'
 import { RegisterReqBody } from '~/models/requests/User.request'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import databaseService from './database.service'
-import RefreshToken from '~/models/schemas/RefreshToken.schema'
-import { ObjectId } from 'mongodb'
 
 class UsersService {
   private signAccessToken(user_id: string) {
@@ -15,7 +15,7 @@ class UsersService {
         user_id,
         token_type: TokenType.AccessToken
       },
-      privateKey: env.JWT_ACCESS_TOKEN,
+      privateKey: env.JWT_ACCESS_TOKEN as string,
       customOptions: {
         expiresIn: env.ACCESS_TOKEN_EXPIRES_IN as any
       }
@@ -27,7 +27,7 @@ class UsersService {
         user_id,
         token_type: TokenType.RefreshToken
       },
-      privateKey: env.JWT_REFRESH_TOKEN,
+      privateKey: env.JWT_REFRESH_TOKEN as string,
       customOptions: {
         expiresIn: env.REFRESH_TOKEN_EXPIRES_IN as any
       }
@@ -69,6 +69,10 @@ class UsersService {
       accessToken,
       refreshToken
     }
+  }
+
+  async logout(refresh_token: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token })
   }
 
   async checkEmailExist(email: string) {
