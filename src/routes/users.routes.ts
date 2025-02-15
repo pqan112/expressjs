@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import {
-  emailVerifyController,
   loginController,
   logoutController,
-  registerController
+  registerController,
+  resendVerifyEmailController,
+  verifyEmailController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -32,12 +33,28 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
 /**
  * Description: Log out
  * method: POST
- * Body: {  email: string, password: string }
+ * headers: { Authorization: Bearer <access_token> }
+ * Body: { email: string, password: string }
  */
 // logout phải dùng method POST (để người dùng bấm nút logout)
 // vì nếu dùng method GET người dùng enter url trên browser
 // thì gọi đến API logout -> không hợp lý
 usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
-usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(emailVerifyController))
+
+/**
+ * Description: Verify email
+ * method: POST
+ * Body: { email_verify_token: string }
+ */
+usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))
+
+/**
+ * Description: Verify email when user click on the link in email
+ * method: POST
+ * headers: { Authorization: Bearer <access_token> }
+ * Body: {}
+ */
+// Muốn verify email thì phải tạo account -> đăng nhập -> verify email
+usersRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandler(resendVerifyEmailController))
 
 export default usersRouter
