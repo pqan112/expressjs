@@ -9,6 +9,7 @@ import {
   LoginReqBody,
   LogoutReqBody,
   RegisterReqBody,
+  ResetPasswordReqBody,
   TokenPayload,
   VerifyEmailReqBody,
   VerifyForgotPasswordReqBody
@@ -46,7 +47,6 @@ export const logoutController = async (req: Request<ParamsDictionary, any, Logou
 export const verifyEmailController = async (req: Request<ParamsDictionary, any, VerifyEmailReqBody>, res: Response) => {
   const { user_id } = req.decoded_email_verify_token as TokenPayload
   const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
-
   if (user === null) {
     res.status(HTTP_STATUS.NOT_FOUND).json({
       message: USERS_MESSAGES.USER_NOT_FOUND
@@ -71,7 +71,6 @@ export const verifyEmailController = async (req: Request<ParamsDictionary, any, 
 export const resendVerifyEmailController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
-
   if (user === null) {
     res.status(HTTP_STATUS.NOT_FOUND).json({
       message: USERS_MESSAGES.USER_NOT_FOUND
@@ -100,6 +99,7 @@ export const forgotPasswordController = async (
   res: Response
 ) => {
   const { _id } = req.user as User
+
   await usersService.forgotPassword((_id as ObjectId).toString())
   res
     .status(HTTP_STATUS.OK)
@@ -113,7 +113,7 @@ export const verifyForgotPasswordController = async (
   res: Response
 ) => {
   const { _id } = req.user as User
-  // Ở đây không gọi verifyForgotPassword vì khi gọi đến set lại forgot password token về empty string
+  // Ở đây không gọi verifyForgotPassword trong usersService vì khi gọi đến set lại forgot password token về empty string
   // nhưng nếu người dùng chỉ nhấn vào quên chưa đổi mật khẩu mới
   // có thể ngày hôm sau người dùng sẽ click vào link đổi verify-forgot-password ở email 1 lần nữa
   // thì lúc này verify-forgot-password-token đã bị xóa, check middleware đã không còn tồn tại verify-forgot-password-token
@@ -124,4 +124,17 @@ export const verifyForgotPasswordController = async (
     .json(
       new ResponseData({ data: null, message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS, status: HTTP_STATUS.OK })
     )
+}
+
+export const resetPasswordController = async (
+  req: Request<ParamsDictionary, any, ResetPasswordReqBody>,
+  res: Response
+) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload
+  const { password } = req.body
+
+  await usersService.resetPassword(user_id, password)
+  res
+    .status(HTTP_STATUS.OK)
+    .json(new ResponseData({ data: null, message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS, status: HTTP_STATUS.OK }))
 }
