@@ -52,9 +52,9 @@ class UsersService {
         user_id,
         token_type: TokenType.ForgotPasswordToken
       },
-      privateKey: env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
+      privateKey: env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string,
       customOptions: {
-        expiresIn: env.EMAIL_VERIFY_TOKEN_EXPIRES_IN as any
+        expiresIn: env.FORGOT_PASSWORD_TOKEN_EXPIRES_IN as any
       }
     })
   }
@@ -180,6 +180,24 @@ class UsersService {
 
     // TODO: send email with the link: https://abc.com/forgot-password?token=token
   }
+
+  // async verifyForgotPassword(user_id: string) {
+  //   await databaseService.users.updateOne(
+  //     {
+  //       _id: new ObjectId(user_id)
+  //     },
+  //     {
+  //       $set: {
+  //         forgot_password_token: ''
+  //       },
+  //       $currentDate: {
+  //         updated_at: true
+  //       }
+  //     }
+  //   )
+
+  //   // TODO: send email with the link: https://abc.com/forgot-password?token=token
+  // }
 }
 
 const usersService = new UsersService()

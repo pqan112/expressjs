@@ -5,7 +5,8 @@ import {
   logoutController,
   registerController,
   resendVerifyEmailController,
-  verifyEmailController
+  verifyEmailController,
+  verifyForgotPasswordController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -13,7 +14,8 @@ import {
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
-  registerValidator
+  registerValidator,
+  verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -66,5 +68,17 @@ usersRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandle
  */
 // Muốn verify email thì phải tạo account -> đăng nhập -> verify email
 usersRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
+
+/**
+ * Description: Verify link in email to reset password
+ * method: POST
+ * Body: { forgot_password_token: string }
+ */
+// Muốn verify email thì phải tạo account -> đăng nhập -> verify email
+usersRouter.post(
+  '/verify-forgot-password',
+  verifyForgotPasswordTokenValidator,
+  wrapRequestHandler(verifyForgotPasswordController)
+)
 
 export default usersRouter

@@ -10,7 +10,8 @@ import {
   LogoutReqBody,
   RegisterReqBody,
   TokenPayload,
-  VerifyEmailReqBody
+  VerifyEmailReqBody,
+  VerifyForgotPasswordReqBody
 } from '~/models/requests/User.request'
 import ResponseData from '~/models/ResponseData'
 import User from '~/models/schemas/User.schema'
@@ -104,5 +105,23 @@ export const forgotPasswordController = async (
     .status(HTTP_STATUS.OK)
     .json(
       new ResponseData({ data: null, message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD, status: HTTP_STATUS.OK })
+    )
+}
+
+export const verifyForgotPasswordController = async (
+  req: Request<ParamsDictionary, any, VerifyForgotPasswordReqBody>,
+  res: Response
+) => {
+  const { _id } = req.user as User
+  // Ở đây không gọi verifyForgotPassword vì khi gọi đến set lại forgot password token về empty string
+  // nhưng nếu người dùng chỉ nhấn vào quên chưa đổi mật khẩu mới
+  // có thể ngày hôm sau người dùng sẽ click vào link đổi verify-forgot-password ở email 1 lần nữa
+  // thì lúc này verify-forgot-password-token đã bị xóa, check middleware đã không còn tồn tại verify-forgot-password-token
+  // thì không hay -> nên không gọi verifyForgotPassword
+  // await usersService.verifyForgotPassword((_id as ObjectId).toString())
+  res
+    .status(HTTP_STATUS.OK)
+    .json(
+      new ResponseData({ data: null, message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS, status: HTTP_STATUS.OK })
     )
 }
