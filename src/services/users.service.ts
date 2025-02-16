@@ -46,6 +46,19 @@ class UsersService {
     })
   }
 
+  private signForgotPasswordToken(user_id: string) {
+    return signToken({
+      payload: {
+        user_id,
+        token_type: TokenType.ForgotPasswordToken
+      },
+      privateKey: env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
+      customOptions: {
+        expiresIn: env.EMAIL_VERIFY_TOKEN_EXPIRES_IN as any
+      }
+    })
+  }
+
   private signAccessAndRefreshToken(user_id: string) {
     return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
@@ -145,6 +158,27 @@ class UsersService {
         }
       }
     )
+  }
+
+  async forgotPassword(user_id: string) {
+    const forgot_password_token = await this.signForgotPasswordToken(user_id)
+    console.log('forgot_password_token', forgot_password_token)
+
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          forgot_password_token
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+
+    // TODO: send email with the link: https://abc.com/forgot-password?token=token
   }
 }
 

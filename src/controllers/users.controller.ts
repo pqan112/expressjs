@@ -5,6 +5,7 @@ import { UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 import {
+  ForgotPasswordReqBody,
   LoginReqBody,
   LogoutReqBody,
   RegisterReqBody,
@@ -89,4 +90,19 @@ export const resendVerifyEmailController = async (req: Request, res: Response) =
   res
     .status(HTTP_STATUS.OK)
     .json(new ResponseData({ data: null, message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS, status: HTTP_STATUS.OK }))
+}
+
+// create forgot password token and update it to MongoDB
+// send email
+export const forgotPasswordController = async (
+  req: Request<ParamsDictionary, any, ForgotPasswordReqBody>,
+  res: Response
+) => {
+  const { _id } = req.user as User
+  await usersService.forgotPassword((_id as ObjectId).toString())
+  res
+    .status(HTTP_STATUS.OK)
+    .json(
+      new ResponseData({ data: null, message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD, status: HTTP_STATUS.OK })
+    )
 }
