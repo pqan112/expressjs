@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {
+  forgotPasswordController,
   loginController,
   logoutController,
   registerController,
@@ -9,6 +10,7 @@ import {
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator
@@ -56,5 +58,13 @@ usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(
  */
 // Muốn verify email thì phải tạo account -> đăng nhập -> verify email
 usersRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandler(resendVerifyEmailController))
+
+/**
+ * Description: Submit email to reset password, send email to user
+ * method: POST
+ * Body: { email: string }
+ */
+// Muốn verify email thì phải tạo account -> đăng nhập -> verify email
+usersRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
 
 export default usersRouter
