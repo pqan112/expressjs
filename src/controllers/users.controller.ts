@@ -138,3 +138,12 @@ export const resetPasswordController = async (
     .status(HTTP_STATUS.OK)
     .json(new ResponseData({ data: null, message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS, status: HTTP_STATUS.OK }))
 }
+
+export const meController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+
+  const result = await usersService.getMe(user_id)
+  res
+    .status(HTTP_STATUS.OK)
+    .json(new ResponseData({ data: result, message: USERS_MESSAGES.GET_ME_SUCCESS, status: HTTP_STATUS.OK }))
+}
