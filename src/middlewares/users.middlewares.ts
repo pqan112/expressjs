@@ -1,10 +1,11 @@
-import { Request } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
+import { StatusCodes } from 'http-status-codes'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import capitalize from 'lodash/capitalize'
 import { ObjectId } from 'mongodb'
 import { env } from '~/configs/environment'
-import { HTTP_STATUS } from '~/constants/httpStatus'
+import { UserVerifyStatus } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/User.request'
@@ -116,7 +117,7 @@ const forgotPasswordTokenSchema: ParamSchema = {
       if (!value) {
         throw new ErrorWithStatus({
           message: USERS_MESSAGES.FORGOT_PASSWORD_TOKEN_IS_REQUIRED,
-          status: HTTP_STATUS.UNAUTHORIZED
+          status: StatusCodes.UNAUTHORIZED
         })
       }
 
@@ -132,13 +133,13 @@ const forgotPasswordTokenSchema: ParamSchema = {
         if (user === null) {
           throw new ErrorWithStatus({
             message: USERS_MESSAGES.USER_NOT_FOUND,
-            status: HTTP_STATUS.UNAUTHORIZED
+            status: StatusCodes.UNAUTHORIZED
           })
         }
         if (user.forgot_password_token !== value) {
           throw new ErrorWithStatus({
             message: USERS_MESSAGES.INVALID_FORGOT_PASSWORD_TOKEN,
-            status: HTTP_STATUS.UNAUTHORIZED
+            status: StatusCodes.UNAUTHORIZED
           })
         }
         ;(req as Request).decoded_forgot_password_token = decoded_forgot_password_token
@@ -146,7 +147,7 @@ const forgotPasswordTokenSchema: ParamSchema = {
         if (error instanceof JsonWebTokenError) {
           throw new ErrorWithStatus({
             message: capitalize(error.message),
-            status: HTTP_STATUS.UNAUTHORIZED
+            status: StatusCodes.UNAUTHORIZED
           })
         }
         throw error
@@ -216,7 +217,7 @@ export const accessTokenValidator = validate(
             if (!access_token) {
               throw new ErrorWithStatus({
                 message: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
-                status: HTTP_STATUS.UNAUTHORIZED
+                status: StatusCodes.UNAUTHORIZED
               })
             }
 
@@ -229,7 +230,7 @@ export const accessTokenValidator = validate(
             } catch (error) {
               throw new ErrorWithStatus({
                 message: capitalize((error as JsonWebTokenError).message),
-                status: HTTP_STATUS.UNAUTHORIZED
+                status: StatusCodes.UNAUTHORIZED
               })
             }
             return true
@@ -251,19 +252,22 @@ export const refreshTokenValidator = validate(
             if (!value) {
               throw new ErrorWithStatus({
                 message: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
-                status: HTTP_STATUS.UNAUTHORIZED
+                status: StatusCodes.UNAUTHORIZED
               })
             }
 
             try {
               const [decoded_refresh_token, refresh_token] = await Promise.all([
-                verifyToken({ token: value, secretOrPublicKey: env.JWT_SECRET_REFRESH_TOKEN as string }),
+                verifyToken({
+                  token: value,
+                  secretOrPublicKey: env.JWT_SECRET_REFRESH_TOKEN as string
+                }),
                 databaseService.refreshTokens.findOne({ token: value })
               ])
               if (refresh_token === null) {
                 throw new ErrorWithStatus({
                   message: USERS_MESSAGES.USED_REFRESH_TOKEN_OR_NOT_EXIST,
-                  status: HTTP_STATUS.UNAUTHORIZED
+                  status: StatusCodes.UNAUTHORIZED
                 })
               }
               ;(req as Request).decoded_refresh_token = decoded_refresh_token
@@ -271,7 +275,7 @@ export const refreshTokenValidator = validate(
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
                   message: capitalize(error.message),
-                  status: HTTP_STATUS.UNAUTHORIZED
+                  status: StatusCodes.UNAUTHORIZED
                 })
               }
               throw error
@@ -295,7 +299,7 @@ export const emailVerifyTokenValidator = validate(
             if (!value) {
               throw new ErrorWithStatus({
                 message: USERS_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED,
-                status: HTTP_STATUS.UNAUTHORIZED
+                status: StatusCodes.UNAUTHORIZED
               })
             }
 
@@ -308,7 +312,7 @@ export const emailVerifyTokenValidator = validate(
             } catch (error) {
               throw new ErrorWithStatus({
                 message: capitalize((error as JsonWebTokenError).message),
-                status: HTTP_STATUS.UNAUTHORIZED
+                status: StatusCodes.UNAUTHORIZED
               })
             }
             return true
@@ -331,7 +335,10 @@ export const forgotPasswordValidator = validate(
               email: value
             })
             if (user === null) {
-              throw new ErrorWithStatus({ message: USERS_MESSAGES.USER_NOT_FOUND, status: HTTP_STATUS.UNAUTHORIZED })
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.USER_NOT_FOUND,
+                status: StatusCodes.UNAUTHORIZED
+              })
             }
             req.user = user
             return true
@@ -362,3 +369,16 @@ export const resetPasswordValidator = validate(
     ['body']
   )
 )
+
+export const verifiedUserValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decoded_authorization as TokenPayload
+  if (verify !== UserVerifyStatus.Verified) {
+    return next(
+      new ErrorWithStatus({
+        message: USERS_MESSAGES.USER_NOT_VERIFIED,
+        status: StatusCodes.FORBIDDEN
+      })
+    )
+  }
+  next()
+}

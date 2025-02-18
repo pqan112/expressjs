@@ -1,12 +1,13 @@
 import { Router } from 'express'
 import {
   forgotPasswordController,
+  getMeController,
   loginController,
   logoutController,
-  meController,
   registerController,
   resendVerifyEmailController,
   resetPasswordController,
+  updateMeController,
   verifyEmailController,
   verifyForgotPasswordController
 } from '~/controllers/users.controller'
@@ -18,6 +19,7 @@ import {
   refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
+  verifiedUserValidator,
   verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -46,14 +48,23 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
 // logout phải dùng method POST (để người dùng bấm nút logout)
 // vì nếu dùng method GET người dùng enter url trên browser
 // thì gọi đến API logout -> không hợp lý
-usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
+usersRouter.post(
+  '/logout',
+  accessTokenValidator,
+  refreshTokenValidator,
+  wrapRequestHandler(logoutController)
+)
 
 /**
  * description: Verify email
  * method: POST
  * body: { email_verify_token: string }
  */
-usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))
+usersRouter.post(
+  '/verify-email',
+  emailVerifyTokenValidator,
+  wrapRequestHandler(verifyEmailController)
+)
 
 /**
  * description: Verify email when user click on the link in email
@@ -62,7 +73,11 @@ usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(
  * body: {}
  */
 // Muốn verify email thì phải tạo account -> đăng nhập -> verify email
-usersRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandler(resendVerifyEmailController))
+usersRouter.post(
+  '/resend-verify-email',
+  accessTokenValidator,
+  wrapRequestHandler(resendVerifyEmailController)
+)
 
 /**
  * description: Submit email to reset password, send email to user
@@ -70,7 +85,11 @@ usersRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandle
  * body: { email: string }
  */
 // Muốn verify email thì phải tạo account -> đăng nhập -> verify email
-usersRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
+usersRouter.post(
+  '/forgot-password',
+  forgotPasswordValidator,
+  wrapRequestHandler(forgotPasswordController)
+)
 
 /**
  * description: Verify link in email to reset password
@@ -89,13 +108,30 @@ usersRouter.post(
  * method: POST
  * body: { forgot-password-token: string, password: string, confirm_password: string }
  */
-usersRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(resetPasswordController))
+usersRouter.post(
+  '/reset-password',
+  resetPasswordValidator,
+  wrapRequestHandler(resetPasswordController)
+)
 
 /**
- * Description: Reset password
+ * Description: Get my profile
  * method: GET
  * headers: { Authorization: Bearer <access_token> }
  */
-usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(meController))
+usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
+
+/**
+ * Description: Update my profile
+ * method: PATCH
+ * headers: { Authorization: Bearer <access_token> }
+ * body: Partial<UserSchema>
+ */
+usersRouter.patch(
+  '/me',
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(updateMeController)
+)
 
 export default usersRouter
