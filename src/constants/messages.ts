@@ -45,10 +45,11 @@ export const USERS_MESSAGES = {
   WEBSITE_MUST_BE_STRING: 'Website must be a string',
   WEBSITE_LENGTH: 'Website length must be from 1 to 200',
   USERNAME_MUST_BE_STRING: 'Username must be a string',
+  USERNAME_LENGTH: 'Website length must be from 1 to 50',
   USERNAME_INVALID:
     'Username must be 4-15 characters long and contain only letters, numbers, underscores, not only numbers',
   IMAGE_URL_MUST_BE_STRING: 'Avatar must be a string',
-  IMAGE_URL_LENGTH: 'Avatar length must be from 1 to 200',
+  IMAGE_URL_LENGTH: 'Avatar length must be from 1 to 300',
   UPDATE_ME_SUCCESS: 'Update my profile success',
   GET_PROFILE_SUCCESS: 'Get profile success',
   FOLLOW_SUCCESS: 'Follow success',

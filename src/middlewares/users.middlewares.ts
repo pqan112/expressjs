@@ -156,6 +156,20 @@ const forgotPasswordTokenSchema: ParamSchema = {
     }
   }
 }
+const imageSchema: ParamSchema = {
+  optional: true,
+  isString: {
+    errorMessage: USERS_MESSAGES.IMAGE_URL_MUST_BE_STRING
+  },
+  isLength: {
+    options: {
+      min: 1,
+      max: 300
+    },
+    errorMessage: USERS_MESSAGES.IMAGE_URL_LENGTH
+  },
+  trim: true
+}
 
 export const loginValidator = validate(
   checkSchema(
@@ -382,3 +396,71 @@ export const verifiedUserValidator = (req: Request, res: Response, next: NextFun
   }
   next()
 }
+
+export const updateMeValidator = validate(
+  checkSchema(
+    {
+      name: { ...nameSchema, optional: true, notEmpty: undefined },
+      date_of_birth: { ...dateOfBirthSchema, optional: true },
+      bio: {
+        optional: true,
+        isString: {
+          errorMessage: USERS_MESSAGES.BIO_MUST_BE_STRING
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 200
+          },
+          errorMessage: USERS_MESSAGES.NAME_LENGTH_MUST_BE_FROM_1_TO_100
+        },
+        trim: true
+      },
+      location: {
+        optional: true,
+        isString: {
+          errorMessage: USERS_MESSAGES.LOCATION_MUST_BE_STRING
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 200
+          },
+          errorMessage: USERS_MESSAGES.LOCATION_LENGTH
+        },
+        trim: true
+      },
+      website: {
+        optional: true,
+        isString: {
+          errorMessage: USERS_MESSAGES.WEBSITE_MUST_BE_STRING
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 200
+          },
+          errorMessage: USERS_MESSAGES.WEBSITE_LENGTH
+        },
+        trim: true
+      },
+      username: {
+        optional: true,
+        isString: {
+          errorMessage: USERS_MESSAGES.USERNAME_MUST_BE_STRING
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 50
+          },
+          errorMessage: USERS_MESSAGES.USERNAME_LENGTH
+        },
+        trim: true
+      },
+      avatar: imageSchema,
+      cover_photo: imageSchema
+    },
+    ['body']
+  )
+)

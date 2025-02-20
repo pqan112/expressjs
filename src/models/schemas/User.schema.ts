@@ -21,7 +21,7 @@ type UserType = {
   cover_photo?: string
 }
 
-// nếu dùng interface sẽ bị báo lỗi typescript
+// nếu dùng interface sẽ chỉ bị báo lỗi typescript
 
 // dùng class sẽ giúp loại bỏ các field không cần thiết được insert vào db
 // ví dụ pass confirm_password vào class User,
