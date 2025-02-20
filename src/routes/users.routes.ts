@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   forgotPasswordController,
   getMeController,
+  getProfileController,
   loginController,
   logoutController,
   registerController,
@@ -11,6 +12,7 @@ import {
   verifyEmailController,
   verifyForgotPasswordController
 } from '~/controllers/users.controller'
+import { filterMiddleware } from '~/middlewares/common.middlewares'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
@@ -23,6 +25,7 @@ import {
   verifiedUserValidator,
   verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
+import { UpdateMeReqBody } from '~/models/requests/User.request'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -133,7 +136,23 @@ usersRouter.patch(
   accessTokenValidator,
   verifiedUserValidator,
   updateMeValidator,
+  filterMiddleware<UpdateMeReqBody>([
+    'avatar',
+    'bio',
+    'cover_photo',
+    'date_of_birth',
+    'location',
+    'name',
+    'username',
+    'website'
+  ]),
   wrapRequestHandler(updateMeController)
 )
+
+/**
+ * Description: Get user profile
+ * method: GET
+ */
+usersRouter.get('/:username', wrapRequestHandler(getProfileController))
 
 export default usersRouter
