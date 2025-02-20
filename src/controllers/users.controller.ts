@@ -6,6 +6,7 @@ import { UserVerifyStatus } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
 import {
   ForgotPasswordReqBody,
+  GetProfileReqParams,
   LoginReqBody,
   LogoutReqBody,
   RegisterReqBody,
@@ -203,13 +204,25 @@ export const updateMeController = async (
   res: Response
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const result = await usersService.updateMe(user_id, req.body)
-  console.log('result', result)
 
+  const result = await usersService.updateMe(user_id, req.body)
   res.status(StatusCodes.OK).json(
     new ResponseData({
       data: result,
       message: USERS_MESSAGES.UPDATE_ME_SUCCESS,
+      status: StatusCodes.OK
+    })
+  )
+}
+
+export const getProfileController = async (req: Request<GetProfileReqParams>, res: Response) => {
+  const { username } = req.params
+
+  const result = await usersService.getProfile(username)
+  res.status(StatusCodes.OK).json(
+    new ResponseData({
+      data: result,
+      message: USERS_MESSAGES.GET_PROFILE_SUCCESS,
       status: StatusCodes.OK
     })
   )
