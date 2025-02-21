@@ -1,5 +1,6 @@
 import { Collection, Db, MongoClient } from 'mongodb'
 import { env } from '~/configs/environment'
+import Follower from '~/models/schemas/Follower.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/User.schema'
 const uri = `mongodb+srv://${env.DB_USERNAME}:${env.DB_PASSWORD}@cluster0.zb3wp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
@@ -41,6 +42,10 @@ class DatabaseService {
 
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection(env.REFRESH_TOKENS_COLLECTION as string)
+  }
+
+  get followers(): Collection<Follower> {
+    return this.db.collection(env.FOLLOWERS_COLLECTION as string)
   }
 }
 

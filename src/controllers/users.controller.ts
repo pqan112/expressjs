@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
 import {
+  FollowReqBody,
   ForgotPasswordReqBody,
   GetProfileReqParams,
   LoginReqBody,
@@ -226,4 +227,31 @@ export const getProfileController = async (req: Request<GetProfileReqParams>, re
       status: StatusCodes.OK
     })
   )
+}
+
+export const followController = async (
+  req: Request<ParamsDictionary, any, FollowReqBody>,
+  res: Response
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { followed_user_id } = req.body
+
+  const result = await usersService.follow(user_id, followed_user_id)
+  if (result === null) {
+    res.status(StatusCodes.OK).json(
+      new ResponseData({
+        data: result,
+        message: USERS_MESSAGES.FOLLOWED,
+        status: StatusCodes.OK
+      })
+    )
+  } else {
+    res.status(StatusCodes.OK).json(
+      new ResponseData({
+        data: null,
+        message: USERS_MESSAGES.FOLLOW_SUCCESS,
+        status: StatusCodes.OK
+      })
+    )
+  }
 }
