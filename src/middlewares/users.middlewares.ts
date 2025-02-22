@@ -2,11 +2,13 @@ import { NextFunction, Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { StatusCodes } from 'http-status-codes'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import pick from 'lodash/pick'
 import capitalize from 'lodash/capitalize'
 import { ObjectId } from 'mongodb'
 import { env } from '~/configs/environment'
 import { UserVerifyStatus } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
+import { REGEX_USERNAME } from '~/constants/regex'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/User.request'
 import databaseService from '~/services/database.service'
@@ -14,6 +16,7 @@ import usersService from '~/services/users.service'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
+import { omit } from 'lodash'
 
 // checkSchema mặc định sẽ validate ở body, cookies, headers, params và query
 // -> ảnh hưởng đến hiệu suất -> nên quy định location validation
@@ -473,14 +476,22 @@ export const updateMeValidator = validate(
         isString: {
           errorMessage: USERS_MESSAGES.USERNAME_MUST_BE_STRING
         },
-        isLength: {
-          options: {
-            min: 1,
-            max: 50
-          },
-          errorMessage: USERS_MESSAGES.USERNAME_LENGTH
-        },
-        trim: true
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!REGEX_USERNAME.test(value)) {
+              throw new Error(USERS_MESSAGES.USERNAME_INVALID)
+            }
+
+            const user = await databaseService.users.findOne({
+              username: value
+            })
+            if (user !== null) {
+              throw new Error(USERS_MESSAGES.USERNAME_EXISTED)
+            }
+            return true
+          }
+        }
       },
       avatar: imageSchema,
       cover_photo: imageSchema
@@ -505,4 +516,38 @@ export const unfollowValidator = validate(
     },
     ['params']
   )
+)
+
+export const changePasswordValidator = validate(
+  checkSchema({
+    old_password: {
+      ...passwordSchema,
+      custom: {
+        options: async (value: string, { req }) => {
+          const { user_id } = (req as Request).decoded_authorization as TokenPayload
+
+          const user = await databaseService.users.findOne({
+            _id: new ObjectId(user_id)
+          })
+          if (!user) {
+            throw new ErrorWithStatus({
+              message: USERS_MESSAGES.USER_NOT_FOUND,
+              status: StatusCodes.NOT_FOUND
+            })
+          }
+          const password = user.password
+          const isMatch = hashPassword(value) === password
+          if (!isMatch) {
+            throw new ErrorWithStatus({
+              message: USERS_MESSAGES.OLD_PASSWORD_NOT_MATCH,
+              status: StatusCodes.UNAUTHORIZED
+            })
+          }
+          return true
+        }
+      }
+    },
+    password: passwordSchema,
+    confirm_password: confirmPasswordSchema
+  })
 )
