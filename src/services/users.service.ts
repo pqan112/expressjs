@@ -328,12 +328,28 @@ class UsersService {
     })
 
     if (follow === null) {
-      return await databaseService.followers.insertOne({
+      await databaseService.followers.insertOne({
         user_id: new ObjectId(user_id),
         followed_user_id: new ObjectId(followed_user_id)
       })
+      return true
     }
-    return null
+    return false
+  }
+
+  async unfollow(user_id: string, followed_user_id: string) {
+    const follow = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+
+    if (follow !== null) {
+      await databaseService.followers.deleteOne({
+        _id: new ObjectId(follow._id)
+      })
+      return true
+    }
+    return false
   }
 }
 
