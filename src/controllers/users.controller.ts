@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
 import {
+  ChangePasswordReqBody,
   FollowReqBody,
   ForgotPasswordReqBody,
   GetProfileReqParams,
@@ -276,6 +277,23 @@ export const unfollowController = async (req: Request<UnfollowReqParams>, res: R
     new ResponseData({
       data: null,
       message: USERS_MESSAGES.ALREADY_UNFOLLOWED,
+      status: StatusCodes.OK
+    })
+  )
+}
+
+export const changePasswordController = async (
+  req: Request<ParamsDictionary, any, ChangePasswordReqBody>,
+  res: Response
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { password } = req.body
+
+  await usersService.changePassword(user_id, password)
+  res.status(StatusCodes.OK).json(
+    new ResponseData({
+      data: null,
+      message: USERS_MESSAGES.CHANGE_PASSWORD_SUCCESS,
       status: StatusCodes.OK
     })
   )

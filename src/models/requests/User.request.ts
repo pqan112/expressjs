@@ -52,6 +52,10 @@ export interface FollowReqBody {
   followed_user_id: string
 }
 
+export interface ChangePasswordReqBody {
+  password: string
+}
+
 export interface TokenPayload extends JwtPayload {
   user_id: string
   token_type: TokenType
