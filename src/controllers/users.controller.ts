@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { StatusCodes } from 'http-status-codes'
 import { ObjectId } from 'mongodb'
+import { env } from '~/configs/environment'
 import { UserVerifyStatus } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
 import {
@@ -41,6 +42,17 @@ export const loginController = async (
       status: StatusCodes.OK
     })
   )
+}
+
+export const oauthController = async (req: Request, res: Response) => {
+  const { code } = req.query
+
+  const result = await usersService.oauth(code as string)
+  const urlRedirect = `${env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}&verify=${result.verify}`
+  // send new_user to client
+  // if new_user=0, register successfully
+  // if new_user=1, login successfully
+  res.redirect(urlRedirect)
 }
 
 export const registerController = async (
