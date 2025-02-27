@@ -18,6 +18,7 @@
   "devDependencies": {
     "@eslint/js": "^9.19.0",
     "@types/express": "^5.0.0",
+    "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/lodash": "^4.17.15",
     "@types/node": "^22.13.0",
@@ -39,6 +40,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
+    "formidable": "^3.5.2",
     "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
