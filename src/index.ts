@@ -5,16 +5,18 @@ import { defaultErrorHandler } from './middlewares/error.middlewares'
 import usersRouter from './routes/users.routes'
 import databaseService from './services/database.service'
 import mediasRouter from './routes/medias.routes'
+import { initUploadsFolder } from './utils/file'
 
 const startApp = () => {
+  // initialize uploads folder
+  initUploadsFolder()
+
   const app = express()
   // middlewares
   app.use(express.json())
-
   // routers
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
-
   // global error handler
   app.use(defaultErrorHandler)
 
