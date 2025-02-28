@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import formidable from 'formidable'
 import path from 'path'
+import { uploadSingleImageController } from '~/controllers/medias.controller'
+import { wrapRequestHandler } from '~/utils/handlers'
 
 // console.log(__dirname)
 // C:\Users\**\**\**\expressjs\src\routes
@@ -9,21 +11,6 @@ import path from 'path'
 
 const mediasRouter = Router()
 
-mediasRouter.post('/upload-image', (req, res, next) => {
-  const form = formidable({
-    uploadDir: path.resolve('uploads'),
-    maxFiles: 1,
-    maxFileSize: 300 * 1024, // 300KB
-    keepExtensions: true
-  })
-
-  form.parse(req, (err, fields, files) => {
-    if (err) {
-      next(err)
-      return
-    }
-    res.json({ message: 'Upload successfully' })
-  })
-})
+mediasRouter.post('/upload-image', wrapRequestHandler(uploadSingleImageController))
 
 export default mediasRouter
