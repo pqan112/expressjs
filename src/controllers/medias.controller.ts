@@ -1,11 +1,8 @@
 import { Request, Response } from 'express'
-import formidable from 'formidable'
-import path from 'path'
-import { handleUploadSingleImage } from '~/utils/file'
+import { StatusCodes } from 'http-status-codes'
+import mediasService from '~/services/medias.service'
 
 export const uploadSingleImageController = async (req: Request, res: Response) => {
-  const data = await handleUploadSingleImage(req)
-
-  console.log(data)
-  res.json(data)
+  const result = await mediasService.handleUploadSingleImage(req)
+  res.status(StatusCodes.OK).json(result)
 }

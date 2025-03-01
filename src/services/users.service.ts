@@ -118,7 +118,6 @@ class UsersService {
       }
     })
     const data = await res.json()
-    console.log('info', data)
 
     return data as {
       id: string
