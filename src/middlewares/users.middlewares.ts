@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { StatusCodes } from 'http-status-codes'
 import { JsonWebTokenError } from 'jsonwebtoken'
-import pick from 'lodash/pick'
 import capitalize from 'lodash/capitalize'
 import { ObjectId } from 'mongodb'
 import { env } from '~/configs/environment'
@@ -16,7 +15,6 @@ import usersService from '~/services/users.service'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
-import { omit } from 'lodash'
 
 // checkSchema mặc định sẽ validate ở body, cookies, headers, params và query
 // -> ảnh hưởng đến hiệu suất -> nên quy định location validation
