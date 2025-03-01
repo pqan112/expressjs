@@ -1,13 +1,11 @@
 import { Request } from 'express'
-import formidable from 'formidable'
+import formidable, { File } from 'formidable'
 import fs from 'fs'
-import path from 'path'
+import { UPLOAD_TEMP_DIR } from '~/constants/dir'
 
 export const initUploadsFolder = () => {
-  const uploadFolderPath = path.resolve('uploads')
-
-  if (!fs.existsSync(uploadFolderPath)) {
-    fs.mkdirSync(uploadFolderPath, {
+  if (!fs.existsSync(UPLOAD_TEMP_DIR)) {
+    fs.mkdirSync(UPLOAD_TEMP_DIR, {
       recursive: true // muốn tạo nested folder thì phải có recursive: true không thì sẽ bị ăn chửi, vd: uploads/images hoặc uploads/videos
     })
   }
@@ -15,7 +13,7 @@ export const initUploadsFolder = () => {
 
 export const handleUploadSingleImage = (req: Request) => {
   const form = formidable({
-    uploadDir: path.resolve('uploads'),
+    uploadDir: UPLOAD_TEMP_DIR,
     maxFiles: 1,
     maxFileSize: 300 * 1024, // 300KB
     keepExtensions: true,
@@ -26,16 +24,11 @@ export const handleUploadSingleImage = (req: Request) => {
         form.emit('error' as any, new Error('File type is not valid') as any)
         return false
       }
-      console.log('1')
       return valid
     }
   })
-  return new Promise((resolve, reject) => {
+  return new Promise<File>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
-      console.log('fields', fields)
-      console.log('files', files)
-      console.log('err', err)
-
       if (err) {
         return reject(err)
       }
@@ -43,7 +36,13 @@ export const handleUploadSingleImage = (req: Request) => {
       if (!Boolean(files.image)) {
         return reject(new Error('File is empty'))
       }
-      resolve(files)
+      resolve((files.image as File[])[0])
     })
   })
+}
+
+export const getNameFromFullname = (fullname: string) => {
+  const nameArray = fullname.split('.')
+  nameArray.pop()
+  return nameArray.join('')
 }
