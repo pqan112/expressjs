@@ -5,18 +5,18 @@ import path from 'path'
 import sharp from 'sharp'
 import { env } from '~/configs/environment'
 import { isProduction } from '~/constants/config'
-import { UPLOAD_DIR } from '~/constants/dir'
+import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
 import { MediaType } from '~/constants/enum'
 import { Media } from '~/models/Media'
-import { getNameFromFullname, handleUploadImage } from '~/utils/file'
+import { getNameFromFullname, handleUploadImage, handleUploadVideo } from '~/utils/file'
 
 class MediasService {
-  async handleUploadImage(req: Request) {
+  async uploadImage(req: Request) {
     const files = await handleUploadImage(req)
     const result: Media[] = await Promise.all(
       files.map(async (file) => {
         const newName = getNameFromFullname(file.newFilename)
-        const newPath = path.resolve(UPLOAD_DIR, `${newName}.jpg`)
+        const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
         // sharp.Sharp.toFile(fileOut: string) fileOut is upload directory
         // sharp.cache(false) to avoid operation not permitte when unlink filepath
         sharp.cache(false)
@@ -24,8 +24,8 @@ class MediasService {
         // after remove EXIF and metadata, remove this file in uploads/temp
         fs.unlinkSync(file.filepath)
         const url = isProduction
-          ? `${env.HOST}/medias/${newName}.jpg`
-          : `http://localhost:${env.PORT}/medias/${newName}.jpg`
+          ? `${env.HOST}/static/image/${newName}.jpg`
+          : `http://localhost:${env.PORT}/static/image/${newName}.jpg`
 
         return {
           url,
@@ -35,6 +35,19 @@ class MediasService {
       })
     )
     return result
+  }
+
+  async uploadVideo(req: Request) {
+    const files = await handleUploadVideo(req)
+    const { newFilename, originalFilename } = files[0]
+    const url = isProduction
+      ? `${env.HOST}/static/video/${newFilename}`
+      : `http://localhost:${env.PORT}/static/video/${newFilename}`
+    return {
+      url,
+      original_name: originalFilename as string,
+      type: MediaType.Video
+    }
   }
 }
 
