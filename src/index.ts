@@ -1,26 +1,26 @@
 import exitHook from 'async-exit-hook'
 import express from 'express'
 import { env } from './configs/environment'
+import { UPLOAD_VIDEO_DIR } from './constants/dir'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
+import mediasRouter from './routes/medias.routes'
+import staticRouter from './routes/static.routes'
 import usersRouter from './routes/users.routes'
 import databaseService from './services/database.service'
-import mediasRouter from './routes/medias.routes'
 import { initUploadsFolder } from './utils/file'
-import path from 'path'
-import { UPLOAD_DIR } from './constants/dir'
 
 const startApp = () => {
+  const app = express()
   // initialize uploads folder
   initUploadsFolder()
-
-  const app = express()
   // middlewares
   app.use(express.json())
   // routers
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
+  app.use('/static', staticRouter)
   // use static file
-  app.use('/medias', express.static(UPLOAD_DIR))
+  app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
   // global error handler
   app.use(defaultErrorHandler)
 
