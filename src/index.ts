@@ -6,6 +6,8 @@ import usersRouter from './routes/users.routes'
 import databaseService from './services/database.service'
 import mediasRouter from './routes/medias.routes'
 import { initUploadsFolder } from './utils/file'
+import path from 'path'
+import { UPLOAD_DIR } from './constants/dir'
 
 const startApp = () => {
   // initialize uploads folder
@@ -17,6 +19,8 @@ const startApp = () => {
   // routers
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
+  // use static file
+  app.use('/medias', express.static(UPLOAD_DIR))
   // global error handler
   app.use(defaultErrorHandler)
 

@@ -11,11 +11,14 @@ export const initUploadsFolder = () => {
   }
 }
 
-export const handleUploadSingleImage = (req: Request) => {
+export const handleUploadImage = (req: Request) => {
+  const MAX_FILES = 4
+
   const form = formidable({
     uploadDir: UPLOAD_TEMP_DIR,
-    maxFiles: 1,
+    maxFiles: MAX_FILES,
     maxFileSize: 300 * 1024, // 300KB
+    maxTotalFileSize: 300 * 1024 * MAX_FILES,
     keepExtensions: true,
     filter: function ({ name, originalFilename, mimetype }) {
       // keep only images
@@ -27,7 +30,7 @@ export const handleUploadSingleImage = (req: Request) => {
       return valid
     }
   })
-  return new Promise<File>((resolve, reject) => {
+  return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
         return reject(err)
@@ -36,7 +39,7 @@ export const handleUploadSingleImage = (req: Request) => {
       if (!Boolean(files.image)) {
         return reject(new Error('File is empty'))
       }
-      resolve((files.image as File[])[0])
+      resolve(files.image as File[])
     })
   })
 }
