@@ -4,6 +4,7 @@ import path from 'path'
 // remove file EXIF and Metadata
 import sharp from 'sharp'
 import { env } from '~/configs/environment'
+import { isProduction } from '~/constants/config'
 import { UPLOAD_DIR } from '~/constants/dir'
 import { getNameFromFullname, handleUploadSingleImage } from '~/utils/file'
 
@@ -18,8 +19,12 @@ class MediasService {
     await sharp(file.filepath).jpeg().toFile(newPath)
     // after remove EXIF and metadata, remove this file in uploads/temp
     fs.unlinkSync(file.filepath)
+    const image = isProduction
+      ? `${env.HOST}/medias/${newName}.jpg`
+      : `http://localhost:${env.PORT}/${newName}.jpg`
+
     return {
-      image: `http://localhost:${env.PORT}/${newName}.jpg`,
+      image,
       orginal_image: file.originalFilename
     }
   }
