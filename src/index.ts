@@ -18,9 +18,10 @@ const startApp = () => {
   // routers
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
+  // custom use static file
   app.use('/static', staticRouter)
-  // use static file
-  app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
+  // use static file default
+  // app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
   // global error handler
   app.use(defaultErrorHandler)
 

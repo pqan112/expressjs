@@ -39,15 +39,16 @@ class MediasService {
 
   async uploadVideo(req: Request) {
     const files = await handleUploadVideo(req)
-    const { newFilename, originalFilename } = files[0]
-    const url = isProduction
-      ? `${env.HOST}/static/video/${newFilename}`
-      : `http://localhost:${env.PORT}/static/video/${newFilename}`
-    return {
-      url,
-      original_name: originalFilename as string,
-      type: MediaType.Video
-    }
+    const result: Media[] = files.map((file) => {
+      return {
+        url: isProduction
+          ? `${env.HOST}/static/video/${file.newFilename}`
+          : `http://localhost:${env.PORT}/static/video/${file.newFilename}`,
+        original_name: file.originalFilename as string,
+        type: MediaType.Video
+      }
+    })
+    return result
   }
 }
 
