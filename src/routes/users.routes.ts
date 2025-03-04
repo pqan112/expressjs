@@ -8,6 +8,7 @@ import {
   loginController,
   logoutController,
   oauthController,
+  refreshTokenController,
   registerController,
   resendVerifyEmailController,
   resetPasswordController,
@@ -71,6 +72,17 @@ usersRouter.post(
   accessTokenValidator,
   refreshTokenValidator,
   wrapRequestHandler(logoutController)
+)
+
+/**
+ * description: Log out
+ * method: POST
+ * body: { refresh_token: string }
+ */
+usersRouter.post(
+  '/refresh-token',
+  refreshTokenValidator,
+  wrapRequestHandler(refreshTokenController)
 )
 
 /**

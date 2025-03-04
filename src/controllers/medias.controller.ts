@@ -90,5 +90,10 @@ export const serveVideoStreamController = (req: Request, res: Response, next: Ne
   }
   res.writeHead(StatusCodes.PARTIAL_CONTENT, headers)
   const videoStreams = fs.createReadStream(videoPath, { start, end })
+
+  // Nếu client đóng kết nối, hủy stream để giải phóng tài nguyên
+  req.on('close', () => {
+    videoStreams.destroy() // Dừng stream ngay lập tức
+  })
   videoStreams.pipe(res)
 }
