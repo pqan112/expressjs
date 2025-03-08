@@ -12,7 +12,7 @@ export const signToken = ({
   payload: string | Buffer | object
   privateKey: string
   options?: jwt.SignOptions
-  customOptions: Omit<jwt.SignOptions, 'algorithm'>
+  customOptions?: Omit<jwt.SignOptions, 'algorithm'>
 }) => {
   const newOptions = { ...options, ...customOptions }
   return new Promise<string>((resolve, reject) => {

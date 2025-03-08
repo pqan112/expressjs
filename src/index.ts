@@ -42,6 +42,8 @@ const startApp = () => {
     console.log('2. Connected successfully to MongoDB')
     console.log('3. Index fields')
     databaseService.indexUsers()
+    databaseService.indexRefreshTokens()
+    databaseService.indexFollowers()
     startApp()
   } catch (error) {
     console.error(error)
