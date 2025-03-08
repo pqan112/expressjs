@@ -26,11 +26,11 @@ const startApp = () => {
   app.use(defaultErrorHandler)
 
   app.listen(env.PORT, () => {
-    console.log(`3. App is running on http://localhost:${env.PORT}`)
+    console.log(`4. App is running on http://localhost:${env.PORT}`)
   })
 
   exitHook(async () => {
-    console.log('4. Disconnecting to MongoDB')
+    console.log('5. Disconnecting to MongoDB')
     databaseService.closeDB()
   })
 }
@@ -38,8 +38,10 @@ const startApp = () => {
 ;(async () => {
   try {
     console.log('1. Connecting to MongoDB')
-    databaseService.connect()
+    await databaseService.connect()
     console.log('2. Connected successfully to MongoDB')
+    console.log('3. Index fields')
+    databaseService.indexUsers()
     startApp()
   } catch (error) {
     console.error(error)
