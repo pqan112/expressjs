@@ -5,7 +5,7 @@ import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import ResponseData from '~/models/ResponseData'
-import mediasService from '~/services/medias.service'
+import mediasService from '~/services/medias.services'
 import fs from 'fs'
 import mime from 'mime'
 

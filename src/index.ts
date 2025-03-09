@@ -6,7 +6,7 @@ import { defaultErrorHandler } from './middlewares/error.middlewares'
 import mediasRouter from './routes/medias.routes'
 import staticRouter from './routes/static.routes'
 import usersRouter from './routes/users.routes'
-import databaseService from './services/database.service'
+import databaseService from './services/database.services'
 import { initUploadsFolder } from './utils/file'
 import tweetsRouter from './routes/tweets.routes'
 
