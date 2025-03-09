@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { tweetController } from '~/controllers/tweets.controller'
+import { createTweetValidator } from '~/middlewares/tweet.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -15,6 +16,7 @@ tweetsRouter.post(
   '/',
   accessTokenValidator,
   verifiedUserValidator,
+  createTweetValidator,
   wrapRequestHandler(tweetController)
 )
 
