@@ -8,6 +8,7 @@ import staticRouter from './routes/static.routes'
 import usersRouter from './routes/users.routes'
 import databaseService from './services/database.service'
 import { initUploadsFolder } from './utils/file'
+import tweetsRouter from './routes/tweets.routes'
 
 const startApp = () => {
   const app = express()
@@ -18,9 +19,10 @@ const startApp = () => {
   // routers
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
+  app.use('/tweets', tweetsRouter)
   // custom use static file
   app.use('/static', staticRouter)
-  // use static file default
+  // use static file default of Expressjs
   // app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
   // global error handler
   app.use(defaultErrorHandler)
