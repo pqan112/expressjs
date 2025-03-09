@@ -20,7 +20,7 @@ import {
   UpdateMeReqBody,
   VerifyEmailReqBody,
   VerifyForgotPasswordReqBody
-} from '~/models/requests/User.request'
+} from '~/models/requests/User.requests'
 import ResponseData from '~/models/ResponseData'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.service'
