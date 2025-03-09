@@ -8,7 +8,6 @@ import isEmpty from 'lodash/isEmpty'
 import { Media } from '~/models/Media'
 
 const tweetTypes = numberEnumToArray(TweetType)
-console.log([tweetTypes])
 const audienceTypes = numberEnumToArray(TweetAudience)
 const mediaTypes = numberEnumToArray(MediaType)
 export const createTweetValidator = validate(

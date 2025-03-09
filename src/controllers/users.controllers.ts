@@ -23,8 +23,8 @@ import {
 } from '~/models/requests/User.requests'
 import ResponseData from '~/models/ResponseData'
 import User from '~/models/schemas/User.schema'
-import databaseService from '~/services/database.service'
-import usersService from '~/services/users.service'
+import databaseService from '~/services/database.services'
+import usersService from '~/services/users.services'
 
 export const loginController = async (
   req: Request<ParamsDictionary, any, LoginReqBody>,
