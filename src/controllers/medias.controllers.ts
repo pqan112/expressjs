@@ -1,13 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
+import fs from 'fs'
 import { StatusCodes } from 'http-status-codes'
+import mime from 'mime'
 import path from 'path'
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import { USERS_MESSAGES } from '~/constants/messages'
-import { ErrorWithStatus } from '~/models/Errors'
 import ResponseData from '~/models/ResponseData'
 import mediasService from '~/services/medias.services'
-import fs from 'fs'
-import mime from 'mime'
 
 export const uploadImageController = async (req: Request, res: Response) => {
   const result = await mediasService.uploadImage(req)
