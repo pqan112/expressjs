@@ -9,6 +9,8 @@ import usersRouter from './routes/users.routes'
 import databaseService from './services/database.services'
 import { initUploadsFolder } from './utils/file'
 import tweetsRouter from './routes/tweets.routes'
+import bookmarksRouter from './routes/bookmarks.routes'
+import likesRouter from './routes/likes.routes'
 
 const startApp = () => {
   const app = express()
@@ -20,6 +22,8 @@ const startApp = () => {
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
   app.use('/tweets', tweetsRouter)
+  app.use('/bookmarks', bookmarksRouter)
+  app.use('/likes', likesRouter)
   // custom use static file
   app.use('/static', staticRouter)
   // use static file default of Expressjs

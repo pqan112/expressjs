@@ -1,6 +1,9 @@
 import { Collection, Db, MongoClient } from 'mongodb'
 import { env } from '~/configs/environment'
+import Bookmark from '~/models/schemas/Bookmark.schema'
 import Follower from '~/models/schemas/Follower.schema'
+import Hashtag from '~/models/schemas/Hashtag.schema'
+import Like from '~/models/schemas/Like.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Tweet from '~/models/schemas/Tweet.schema'
 import User from '~/models/schemas/User.schema'
@@ -75,6 +78,18 @@ class DatabaseService {
 
   get tweets(): Collection<Tweet> {
     return this.db.collection(env.TWEETS_COLLECTION as string)
+  }
+
+  get hashtags(): Collection<Hashtag> {
+    return this.db.collection(env.HASHTAGS_COLLECTION as string)
+  }
+
+  get bookmarks(): Collection<Bookmark> {
+    return this.db.collection(env.BOOKMARKS_COLLECTION as string)
+  }
+
+  get likes(): Collection<Like> {
+    return this.db.collection(env.LIKES_COLLECTION as string)
   }
 }
 
