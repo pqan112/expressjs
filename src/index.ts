@@ -46,10 +46,13 @@ const startApp = () => {
     console.log('1. Connecting to MongoDB')
     await databaseService.connect()
     console.log('2. Connected successfully to MongoDB')
-    console.log('3. Index fields')
-    databaseService.indexUsers()
-    databaseService.indexRefreshTokens()
-    databaseService.indexFollowers()
+    console.log('3. Index collections')
+    await Promise.all([
+      databaseService.indexUsers(),
+      databaseService.indexRefreshTokens(),
+      databaseService.indexFollowers()
+    ])
+
     startApp()
   } catch (error) {
     console.error(error)
