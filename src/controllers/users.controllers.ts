@@ -301,15 +301,15 @@ export const unfollowController = async (req: Request<UnfollowReqParams>, res: R
         status: StatusCodes.OK
       })
     )
-    return
+  } else {
+    res.status(StatusCodes.OK).json(
+      new ResponseData({
+        data: null,
+        message: USERS_MESSAGES.ALREADY_UNFOLLOWED,
+        status: StatusCodes.OK
+      })
+    )
   }
-  res.status(StatusCodes.OK).json(
-    new ResponseData({
-      data: null,
-      message: USERS_MESSAGES.ALREADY_UNFOLLOWED,
-      status: StatusCodes.OK
-    })
-  )
 }
 
 export const changePasswordController = async (
