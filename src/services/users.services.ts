@@ -394,8 +394,6 @@ class UsersService {
   //       }
   //     }
   //   )
-
-  //   // TODO: send email with the link: https://abc.com/forgot-password?token=token
   // }
 
   async resetPassword(user_id: string, password: string) {
