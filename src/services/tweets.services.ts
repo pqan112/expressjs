@@ -44,6 +44,8 @@ class TweetsService {
     const tweet = await databaseService.tweets.findOne({ _id: result.insertedId })
     return tweet
   }
+
+  async getTweet(user_id: string, tweet_id: string) {}
 }
 
 const tweetsService = new TweetsService()
