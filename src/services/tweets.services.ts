@@ -3,6 +3,7 @@ import databaseService from './database.services'
 import Tweet from '~/models/schemas/Tweet.schema'
 import { ObjectId, WithId } from 'mongodb'
 import Hashtag from '~/models/schemas/Hashtag.schema'
+import User from '~/models/schemas/User.schema'
 
 class TweetsService {
   async checkAndCreateHashtag(hashtags: string[]) {
@@ -45,7 +46,39 @@ class TweetsService {
     return tweet
   }
 
-  async getTweet(user_id: string, tweet_id: string) {}
+  async increaseView(tweet_id: string, user_id?: string, author?: User) {
+    // nếu người xem không phải là tác giả và không đăng nhập thì tăng guest_views
+    // nếu người xem đã đăng nhập và không phải là tác giả thì tăng user_views
+    const $inc = author?._id?.equals(user_id)
+      ? {}
+      : user_id
+        ? { user_views: 1 }
+        : { guest_views: 1 }
+    console.log(author?._id, user_id)
+    const result = await databaseService.tweets.findOneAndUpdate(
+      {
+        _id: new ObjectId(tweet_id)
+      },
+      {
+        $inc,
+        $currentDate: {
+          updated_at: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          guest_views: 1,
+          user_views: 1
+        }
+      }
+    )
+
+    return result as WithId<{
+      guest_views: number
+      user_views: number
+    }>
+  }
 }
 
 const tweetsService = new TweetsService()

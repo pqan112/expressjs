@@ -22,9 +22,19 @@ const tweetController = {
   },
 
   getTweet: async (req: Request, res: Response) => {
+    const result = await tweetsService.increaseView(
+      req.params.tweet_id,
+      req.decoded_authorization?.user_id,
+      req.author
+    )
+    const tweet = {
+      ...req.tweet,
+      guest_views: result.guest_views,
+      user_views: result.user_views
+    }
     res.status(StatusCodes.OK).json(
       new ResponseData({
-        data: null,
+        data: tweet,
         status: StatusCodes.OK,
         message: TWEETS_MESSAGES.GET_SUCCESSFULLY
       })
