@@ -53,7 +53,6 @@ const bookmarkController = {
   getBookmarksController: async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const result = await bookmarksService.getBookmarks(user_id)
-    console.log(result)
 
     res.status(StatusCodes.OK).json(
       new ResponseData({
