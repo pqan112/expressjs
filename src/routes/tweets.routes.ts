@@ -42,4 +42,19 @@ tweetsRouter.get(
   wrapRequestHandler(tweetController.getTweet)
 )
 
+/**
+ * description: Get tweet children (comment, retweet and quote tweet)
+ * method: GET
+ * headers: { Authorization?: Bearer <access_token> }
+ * query: { limit: number, page: number, tweet_type: TweetType }
+ */
+tweetsRouter.get(
+  '/:tweet_id/children',
+  tweetIdValidator,
+  isUserLoggedInValidator(accessTokenValidator),
+  isUserLoggedInValidator(verifiedUserValidator),
+  audienceValidator,
+  wrapRequestHandler(tweetController.getTweetChildren)
+)
+
 export default tweetsRouter
