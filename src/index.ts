@@ -11,6 +11,7 @@ import { initUploadsFolder } from './utils/file'
 import tweetsRouter from './routes/tweets.routes'
 import bookmarksRouter from './routes/bookmarks.routes'
 import likesRouter from './routes/likes.routes'
+// import '~/utils/fake'
 
 const startApp = () => {
   const app = express()
