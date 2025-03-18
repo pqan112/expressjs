@@ -3,7 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { StatusCodes } from 'http-status-codes'
 import { TweetType } from '~/constants/enum'
 import { TWEETS_MESSAGES } from '~/constants/messages'
-import { TweetRequestBody } from '~/models/requests/Tweet.requests'
+import { TweetParam, TweetQuery, TweetRequestBody } from '~/models/requests/Tweet.requests'
 import { TokenPayload } from '~/models/requests/User.requests'
 import ResponseData from '~/models/ResponseData'
 import tweetsService from '~/services/tweets.services'
@@ -22,7 +22,7 @@ const tweetController = {
     )
   },
 
-  getTweet: async (req: Request, res: Response) => {
+  getTweet: async (req: Request<TweetParam>, res: Response) => {
     const result = await tweetsService.increaseView(
       req.params.tweet_id,
       req.decoded_authorization?.user_id,
@@ -43,7 +43,7 @@ const tweetController = {
     )
   },
 
-  getTweetChildren: async (req: Request, res: Response) => {
+  getTweetChildren: async (req: Request<TweetParam, any, any, TweetQuery>, res: Response) => {
     const { tweet_id } = req.params
     const limit = Number(req.query.limit)
     const page = Number(req.query.page)
