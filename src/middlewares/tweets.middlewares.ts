@@ -1,4 +1,4 @@
-import { checkSchema } from 'express-validator'
+import { checkSchema, ParamSchema } from 'express-validator'
 import { ObjectId } from 'mongodb'
 import { MediaType, TweetAudience, TweetType, UserVerifyStatus } from '~/constants/enum'
 import { TWEETS_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
@@ -18,6 +18,33 @@ import User from '~/models/schemas/User.schema'
 const tweetTypes = numberEnumToArray(TweetType)
 const audienceTypes = numberEnumToArray(TweetAudience)
 const mediaTypes = numberEnumToArray(MediaType)
+
+const limitSchema: ParamSchema = {
+  isNumeric: true,
+  custom: {
+    options: (value, { req }) => {
+      const num = Number(value)
+      if (num > 100 || num < 1) {
+        throw new Error('1 <= limit <= 100')
+      }
+      return true
+    }
+  }
+}
+
+const pageSchema: ParamSchema = {
+  isNumeric: true,
+  custom: {
+    options: (value, { req }) => {
+      const num = Number(value)
+      if (num < 1) {
+        throw new Error('1 <= page')
+      }
+      return true
+    }
+  }
+}
+
 export const createTweetValidator = validate(
   checkSchema(
     {
@@ -321,31 +348,17 @@ export const getTweetChildrenValidator = validate(
           options: [tweetTypes],
           errorMessage: TWEETS_MESSAGES.INVALID_TYPE
         }
-      },
-      limit: {
-        isNumeric: true,
-        custom: {
-          options: (value, { req }) => {
-            const num = Number(value)
-            if (num > 100 || num < 1) {
-              throw new Error('1 <= limit <= 100')
-            }
-            return true
-          }
-        }
-      },
-      page: {
-        isNumeric: true,
-        custom: {
-          options: (value, { req }) => {
-            const num = Number(value)
-            if (num < 1) {
-              throw new Error('1 <= page')
-            }
-            return true
-          }
-        }
       }
+    },
+    ['query']
+  )
+)
+
+export const paginationValidator = validate(
+  checkSchema(
+    {
+      limit: limitSchema,
+      page: pageSchema
     },
     ['query']
   )

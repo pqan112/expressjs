@@ -4,6 +4,7 @@ import {
   audienceValidator,
   createTweetValidator,
   getTweetChildrenValidator,
+  paginationValidator,
   tweetIdValidator
 } from '~/middlewares/tweets.middlewares'
 import {
@@ -53,10 +54,25 @@ tweetsRouter.get(
   '/:tweet_id/children',
   tweetIdValidator,
   getTweetChildrenValidator,
+  paginationValidator,
   isUserLoggedInValidator(accessTokenValidator),
   isUserLoggedInValidator(verifiedUserValidator),
   audienceValidator,
   wrapRequestHandler(tweetController.getTweetChildren)
+)
+
+/**
+ * description: Get new feeds
+ * method: GET
+ * headers: { Authorization: Bearer <access_token> }
+ * query: { limit: number, page: number }
+ */
+tweetsRouter.get(
+  '/',
+  accessTokenValidator,
+  verifiedUserValidator,
+  paginationValidator,
+  wrapRequestHandler(tweetController.getNewFeeds)
 )
 
 export default tweetsRouter
