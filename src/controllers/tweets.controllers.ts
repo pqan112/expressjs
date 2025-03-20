@@ -3,7 +3,12 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { StatusCodes } from 'http-status-codes'
 import { TweetType } from '~/constants/enum'
 import { TWEETS_MESSAGES } from '~/constants/messages'
-import { TweetParam, TweetQuery, TweetRequestBody } from '~/models/requests/Tweet.requests'
+import {
+  Pagination,
+  TweetParam,
+  TweetQuery,
+  TweetRequestBody
+} from '~/models/requests/Tweet.requests'
 import { TokenPayload } from '~/models/requests/User.requests'
 import ResponseData from '~/models/ResponseData'
 import tweetsService from '~/services/tweets.services'
@@ -67,6 +72,33 @@ const tweetController = {
           limit,
           total_documents,
           total_page: Math.ceil(total_documents / limit)
+        },
+        status: StatusCodes.OK,
+        message: TWEETS_MESSAGES.GET_SUCCESSFULLY
+      })
+    )
+  },
+
+  getNewFeeds: async (req: Request<ParamsDictionary, any, any, Pagination>, res: Response) => {
+    const limit = Number(req.query.limit)
+    const page = Number(req.query.page)
+    const author = req.author
+    const user_id = req.decoded_authorization?.user_id
+    await tweetsService.getNewFeeds({
+      user_id,
+      author,
+      limit,
+      page
+    })
+
+    res.status(StatusCodes.OK).json(
+      new ResponseData({
+        data: {
+          // tweets,
+          page,
+          limit
+          // total_documents,
+          // total_page: Math.ceil(total_documents / limit)
         },
         status: StatusCodes.OK,
         message: TWEETS_MESSAGES.GET_SUCCESSFULLY
