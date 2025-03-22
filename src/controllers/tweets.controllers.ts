@@ -82,11 +82,9 @@ const tweetController = {
   getNewFeeds: async (req: Request<ParamsDictionary, any, any, Pagination>, res: Response) => {
     const limit = Number(req.query.limit)
     const page = Number(req.query.page)
-    const author = req.author
     const user_id = req.decoded_authorization?.user_id
-    await tweetsService.getNewFeeds({
+    const { tweets, total_documents } = await tweetsService.getNewFeeds({
       user_id,
-      author,
       limit,
       page
     })
@@ -94,14 +92,14 @@ const tweetController = {
     res.status(StatusCodes.OK).json(
       new ResponseData({
         data: {
-          // tweets,
+          tweets,
           page,
-          limit
+          limit,
           // total_documents,
-          // total_page: Math.ceil(total_documents / limit)
+          total_page: Math.ceil(total_documents / limit)
         },
         status: StatusCodes.OK,
-        message: TWEETS_MESSAGES.GET_SUCCESSFULLY
+        message: TWEETS_MESSAGES.GET_NEW_FEEDS_SUCCESSFULLY
       })
     )
   }
