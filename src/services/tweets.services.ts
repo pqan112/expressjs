@@ -4,7 +4,8 @@ import Tweet from '~/models/schemas/Tweet.schema'
 import { ObjectId, WithId } from 'mongodb'
 import Hashtag from '~/models/schemas/Hashtag.schema'
 import User from '~/models/schemas/User.schema'
-import { TweetType } from '~/constants/enum'
+import { TweetAudience, TweetType } from '~/constants/enum'
+import isEmpty from 'lodash/isEmpty'
 
 class TweetsService {
   async checkAndCreateHashtag(hashtags: string[]) {
@@ -100,6 +101,12 @@ class TweetsService {
             parent_id: new ObjectId(tweet_id),
             type: tweet_type
           }
+        },
+        {
+          $skip: (page - 1) * limit
+        },
+        {
+          $limit: limit
         },
         {
           $lookup: {
@@ -206,12 +213,6 @@ class TweetsService {
             likes: 0,
             tweet_children: 0
           }
-        },
-        {
-          $skip: (page - 1) * limit
-        },
-        {
-          $limit: limit
         }
       ])
       .toArray()
@@ -220,20 +221,6 @@ class TweetsService {
     const ids = tweets.map((tweet) => tweet._id as ObjectId)
     // do updateMany không return về result nên phải update manually
     const date = new Date()
-    await databaseService.tweets.updateMany(
-      {
-        _id: {
-          $in: ids
-        }
-      },
-      {
-        $inc: inc,
-        // không dùng currentDate, nên dùng set để update date cho đồng bộ với kết quả trả về
-        $set: {
-          updated_at: date
-        }
-      }
-    )
 
     const [, total] = await Promise.all([
       databaseService.tweets.updateMany(
@@ -269,17 +256,7 @@ class TweetsService {
     return { tweets, total_documents: total }
   }
 
-  async getNewFeeds({
-    user_id,
-    author,
-    page,
-    limit
-  }: {
-    user_id?: string
-    author?: User | null
-    page: number
-    limit: number
-  }) {
+  async getNewFeeds({ user_id, page, limit }: { user_id?: string; page: number; limit: number }) {
     const followed_user_ids = await databaseService.followers
       .find(
         {
@@ -295,7 +272,246 @@ class TweetsService {
       .toArray()
 
     const ids: ObjectId[] = followed_user_ids.map((item) => item.followed_user_id)
+    // new feeds bao gồm tweet của chính mình
     ids.push(new ObjectId(user_id))
+
+    const [tweets, total] = await Promise.all([
+      databaseService.tweets
+        .aggregate<Tweet>([
+          {
+            $match: {
+              user_id: {
+                $in: ids
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'user_id',
+              foreignField: '_id',
+              as: 'user'
+            }
+          },
+          {
+            $unwind: {
+              path: '$user'
+            }
+          },
+          {
+            $match: {
+              $or: [
+                {
+                  audience: TweetAudience.Everyone
+                },
+                {
+                  $and: [
+                    {
+                      audience: TweetAudience.TwitterCircle
+                    },
+                    {
+                      'user.twitter_circle': {
+                        $in: [new ObjectId(user_id)]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            $skip: limit * (page - 1)
+          },
+          {
+            $limit: limit
+          },
+          {
+            $lookup: {
+              from: 'hashtags',
+              localField: 'hashtags',
+              foreignField: '_id',
+              as: 'hashtags'
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'mentions',
+              foreignField: '_id',
+              as: 'mentions'
+            }
+          },
+          {
+            $addFields: {
+              mentions: {
+                $map: {
+                  input: '$mentions',
+                  as: 'mention',
+                  in: {
+                    _id: '$$mention._id',
+                    name: '$$mention.name',
+                    email: '$$mention.email',
+                    username: '$$mention.username'
+                  }
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'bookmarks',
+              localField: '_id',
+              foreignField: 'tweet_id',
+              as: 'bookmarks'
+            }
+          },
+          {
+            $lookup: {
+              from: 'likes',
+              localField: '_id',
+              foreignField: 'tweet_id',
+              as: 'likes'
+            }
+          },
+          {
+            $lookup: {
+              from: 'tweets',
+              localField: '_id',
+              foreignField: 'parent_id',
+              as: 'tweet_children'
+            }
+          },
+          {
+            $addFields: {
+              bookmark_count: {
+                $size: '$bookmarks'
+              },
+              like_count: {
+                $size: '$likes'
+              },
+              retweet_count: {
+                $size: {
+                  $filter: {
+                    input: '$tweet_children',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TweetType.Retweet]
+                    }
+                  }
+                }
+              },
+              comment_count: {
+                $size: {
+                  $filter: {
+                    input: '$tweet_children',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TweetType.Comment]
+                    }
+                  }
+                }
+              },
+              quote_count: {
+                $size: {
+                  $filter: {
+                    input: '$tweet_children',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TweetType.QuoteTweet]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              bookmarks: 0,
+              likes: 0,
+              tweet_children: 0,
+              user: {
+                password: 0,
+                email_verify_token: 0,
+                forgot_password_token: 0,
+                date_of_birth: 0
+              }
+            }
+          }
+        ])
+        .toArray(),
+      databaseService.tweets
+        .aggregate([
+          {
+            $match: {
+              user_id: {
+                $in: ids
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'user_id',
+              foreignField: '_id',
+              as: 'user'
+            }
+          },
+          {
+            $unwind: {
+              path: '$user'
+            }
+          },
+          {
+            $match: {
+              $or: [
+                {
+                  audience: TweetAudience.Everyone
+                },
+                {
+                  $and: [
+                    {
+                      audience: TweetAudience.TwitterCircle
+                    },
+                    {
+                      'user.twitter_circle': {
+                        $in: [new ObjectId(user_id)]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          { $count: 'total' }
+        ])
+        .toArray()
+    ])
+
+    const inc = { user_views: 1 }
+    const tweet_ids = tweets.map((tweet) => tweet._id as ObjectId)
+
+    const date = new Date()
+    await databaseService.tweets.updateMany(
+      {
+        _id: {
+          $in: tweet_ids
+        }
+      },
+      {
+        $inc: inc,
+        // không dùng currentDate, nên dùng set để update date cho đồng bộ với kết quả trả về
+        $set: {
+          updated_at: date
+        }
+      }
+    )
+
+    tweets.forEach((tweet) => {
+      tweet.updated_at = date
+      tweet.user_views += 1
+    })
+
+    return { tweets, total_documents: total[0].total }
   }
 }
 
