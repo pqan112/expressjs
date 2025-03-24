@@ -12,6 +12,7 @@ import tweetsRouter from './routes/tweets.routes'
 import bookmarksRouter from './routes/bookmarks.routes'
 import likesRouter from './routes/likes.routes'
 // import '~/utils/fake'
+import cors, { CorsOptions } from 'cors'
 
 const startApp = () => {
   const app = express()
@@ -19,6 +20,11 @@ const startApp = () => {
   initUploadsFolder()
   // middlewares
   app.use(express.json())
+  app.use(
+    cors({
+      origin: '*'
+    })
+  )
   // routers
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
