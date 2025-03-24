@@ -1,0 +1,125 @@
+openapi: 3.0.4
+info:
+  title: Twitter clone Swagger 3.0
+  description: |-
+    Learn to create a server with ExpressJs
+
+    Some useful links:
+    - [The project repository](https://github.com/pqan112/expressjs)
+    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  termsOfService: https://swagger.io/terms/
+  contact:
+    email: anpham1122000@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: http://localhost:4000
+tags:
+  # - name: pet
+  #   description: Access to Petstore orders
+  #   externalDocs:
+  #     description: Find out more about our store
+  #     url: https://swagger.io
+  - name: users
+    description: Operations about user
+paths:
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Log in.
+      description: Log in to the system.
+      operationId: login
+      requestBody:
+        description: login with email and password
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: anpham1122000@gmail.com
+                password:
+                  type: string
+                  example: An@112
+        required: true
+      responses:
+        '200':
+          description: login successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Login successfully
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        example: 'token...'
+                      refresh_token:
+                        type: string
+                        example: 'token...'
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Register an account.
+      description: Register an account.
+      operationId: register
+      requestBody:
+        description: Register with email and password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBody'
+        required: true
+      responses:
+        '200':
+          description: Register successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessAuthentication'
+
+components:
+  schemas:
+    RegisterBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: anpham1122000@gmail.com
+        password:
+          type: string
+          example: An@112
+    SuccessAuthentication:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Register successfully
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+              example: 'token...'
+            refresh_token:
+              type: string
+              example: 'token...'
