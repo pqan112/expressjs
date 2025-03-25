@@ -93,6 +93,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessAuthentication'
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: get user profile.
+      description: get user profile.
+      operationId: getProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Get user profile successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 
 components:
   schemas:
@@ -123,3 +139,64 @@ components:
             refresh_token:
               type: string
               example: 'token...'
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: MongoId
+          example: 67b8a6e162c6f44b9853d256
+        name:
+          type: string
+          example: An
+        email:
+          type: string
+          format: email
+          example: pqan112@gmail.com
+        date_of_birth:
+          type: string
+          format: ISO8601
+          example: 2025-02-02T16:39:34.918Z
+        created_at:
+          type: string
+          format: ISO8601
+          example: 2025-02-02T16:39:34.918Z
+        updated_at:
+          type: string
+          format: ISO8601
+          example: 2025-02-02T16:39:34.918Z
+        verify:
+          $ref: '#/components/schemas/UserVerifyStatus'
+        twitter_circle:
+          type: array
+          items:
+            type: string
+            format: MongoId
+          example: ['67b8a6e123c6f44b5653d656']
+        bio:
+          type: string
+          example: sleep, sleep and sleep
+        location:
+          type: string
+          example: den la don, HCM city
+        website:
+          type: string
+          example: https://swagger.io
+        username:
+          type: string
+          example: pqan1102
+        avatar:
+          type: string
+          example: http://localhost:4000/images/avatars/johndoe.jpg
+        cover_photo:
+          type: string
+          example: http://localhost:4000/images/avatars/johndoe.png
+    UserVerifyStatus:
+      type: number
+      enum: [Unverified, Verified, Banned]
+      example: 1
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

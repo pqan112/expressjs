@@ -13,6 +13,17 @@ import bookmarksRouter from './routes/bookmarks.routes'
 import likesRouter from './routes/likes.routes'
 // import '~/utils/fake'
 import cors, { CorsOptions } from 'cors'
+import swaggerUi from 'swagger-ui-express'
+import { readFileSync } from 'fs'
+import path from 'path'
+import YAML from 'yaml'
+
+const corOptions: CorsOptions = {
+  origin: '*'
+}
+
+const swaggerFile = readFileSync(path.resolve('swagger.yml'), 'utf-8')
+const swaggerDocument = YAML.parse(swaggerFile)
 
 const startApp = () => {
   const app = express()
@@ -20,11 +31,9 @@ const startApp = () => {
   initUploadsFolder()
   // middlewares
   app.use(express.json())
-  app.use(
-    cors({
-      origin: '*'
-    })
-  )
+  app.use(cors(corOptions))
+
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
   // routers
   app.use('/users', usersRouter)
   app.use('/medias', mediasRouter)
