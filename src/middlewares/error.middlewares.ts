@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { isProduction } from '~/constants/config'
+import { isProduction } from '~/configs/environment'
 import { ErrorWithStatus } from '~/models/Errors'
 
 export const defaultErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {

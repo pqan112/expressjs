@@ -65,31 +65,31 @@ class DatabaseService {
   }
 
   get users(): Collection<User> {
-    return this.db.collection(env.USERS_COLLECTION as string)
+    return this.db.collection(env.USERS_COLLECTION)
   }
 
   get refreshTokens(): Collection<RefreshToken> {
-    return this.db.collection(env.REFRESH_TOKENS_COLLECTION as string)
+    return this.db.collection(env.REFRESH_TOKENS_COLLECTION)
   }
 
   get followers(): Collection<Follower> {
-    return this.db.collection(env.FOLLOWERS_COLLECTION as string)
+    return this.db.collection(env.FOLLOWERS_COLLECTION)
   }
 
   get tweets(): Collection<Tweet> {
-    return this.db.collection(env.TWEETS_COLLECTION as string)
+    return this.db.collection(env.TWEETS_COLLECTION)
   }
 
   get hashtags(): Collection<Hashtag> {
-    return this.db.collection(env.HASHTAGS_COLLECTION as string)
+    return this.db.collection(env.HASHTAGS_COLLECTION)
   }
 
   get bookmarks(): Collection<Bookmark> {
-    return this.db.collection(env.BOOKMARKS_COLLECTION as string)
+    return this.db.collection(env.BOOKMARKS_COLLECTION)
   }
 
   get likes(): Collection<Like> {
-    return this.db.collection(env.LIKES_COLLECTION as string)
+    return this.db.collection(env.LIKES_COLLECTION)
   }
 }
 
