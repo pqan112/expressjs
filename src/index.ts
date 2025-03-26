@@ -1,6 +1,6 @@
 import exitHook from 'async-exit-hook'
 import express from 'express'
-import { env } from './configs/environment'
+import { env, isProduction } from './configs/environment'
 import { UPLOAD_VIDEO_DIR } from './constants/dir'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import mediasRouter from './routes/medias.routes'
@@ -17,10 +17,21 @@ import swaggerUi from 'swagger-ui-express'
 import { readFileSync } from 'fs'
 import path from 'path'
 import YAML from 'yaml'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 
 const corOptions: CorsOptions = {
-  origin: '*'
+  origin: isProduction ? env.CLIENT_URL : '*',
+  methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE']
 }
+
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 10 minutes).
+  standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+  legacyHeaders: false // Disable the `X-RateLimit-*` headers.
+  // store: ... , // Redis, Memcached, etc. See below.
+})
 
 const swaggerFile = readFileSync(path.resolve('swagger.yml'), 'utf-8')
 const swaggerDocument = YAML.parse(swaggerFile)
@@ -31,8 +42,9 @@ const startApp = () => {
   initUploadsFolder()
   // middlewares
   app.use(express.json())
+  app.use(helmet())
   app.use(cors(corOptions))
-
+  app.use(limiter)
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
   // routers
   app.use('/users', usersRouter)

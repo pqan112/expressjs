@@ -19,7 +19,7 @@ class UsersService {
         token_type: TokenType.AccessToken,
         verify
       },
-      privateKey: env.JWT_SECRET_ACCESS_TOKEN as string,
+      privateKey: env.JWT_SECRET_ACCESS_TOKEN,
       customOptions: {
         expiresIn: env.ACCESS_TOKEN_EXPIRES_IN as any
       }
@@ -42,7 +42,7 @@ class UsersService {
           verify,
           exp
         },
-        privateKey: env.JWT_SECRET_REFRESH_TOKEN as string
+        privateKey: env.JWT_SECRET_REFRESH_TOKEN
       })
     }
 
@@ -52,7 +52,7 @@ class UsersService {
         token_type: TokenType.RefreshToken,
         verify
       },
-      privateKey: env.JWT_SECRET_REFRESH_TOKEN as string,
+      privateKey: env.JWT_SECRET_REFRESH_TOKEN,
       customOptions: {
         expiresIn: env.REFRESH_TOKEN_EXPIRES_IN as any
       }
@@ -65,7 +65,7 @@ class UsersService {
         token_type: TokenType.EmailVerifyToken,
         verify
       },
-      privateKey: env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
+      privateKey: env.JWT_SECRET_EMAIL_VERIFY_TOKEN,
       customOptions: {
         expiresIn: env.EMAIL_VERIFY_TOKEN_EXPIRES_IN as any
       }
@@ -84,7 +84,7 @@ class UsersService {
         token_type: TokenType.ForgotPasswordToken,
         verify
       },
-      privateKey: env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string,
+      privateKey: env.JWT_SECRET_FORGOT_PASSWORD_TOKEN,
       customOptions: {
         expiresIn: env.FORGOT_PASSWORD_TOKEN_EXPIRES_IN as any
       }
@@ -105,16 +105,16 @@ class UsersService {
   private decodeRefreshToken(refresh_token: string) {
     return verifyToken({
       token: refresh_token,
-      secretOrPublicKey: env.JWT_SECRET_REFRESH_TOKEN as string
+      secretOrPublicKey: env.JWT_SECRET_REFRESH_TOKEN
     })
   }
 
   private async getOauthGoogleToken(code: string) {
     const body = new URLSearchParams({
       code,
-      client_id: env.GOOGLE_CLIENT_ID as string,
-      client_secret: env.GOOGLE_CLIENT_SECRET as string,
-      redirect_uri: env.GOOGLE_AUTHORIZED_REDIRECT_URI as string,
+      client_id: env.GOOGLE_CLIENT_ID,
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: env.GOOGLE_AUTHORIZED_REDIRECT_URI,
       grant_type: 'authorization_code'
     })
 
